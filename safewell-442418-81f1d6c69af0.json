@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "safewell-442418",
+  "private_key_id": "81f1d6c69af0c14c25f441121b640c22a16481f4",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDEesv9RXL1KWdx\nug6JtVFvM9NsN01imQjKsNh+7KU979QFZ0POxAy/Now9ciybufRkE/Vh/YeNvGuu\nZjGF7Maw+EDP6ana564njUt6MPmOSUy2WtSudSWi8JiLMUFI4RkLcRp8ush3mOoH\nacikMqzjd7tiIbfE82siRKF0VkH8aVllSVXgCMtLsXiI4b7KTXQ6RyLRQvuJ+70B\nm+VOf6jgSrKlRaxCMCwbnWK4MvxAA3dZDe5zKR/TZZQIuvpjkBmTgfxZ2NR7t8Ci\n6XJN+/TAhFixuaIBELsb9zamxq4MH+1V22cLZvsWRL/vjYVCTur+sMenMjV9UNYZ\n23TXYbeNAgMBAAECggEAAQ3s2OvNyjprjctjHZXfNueomEzGedauNExCDsUdVxlz\nSIe9cB25BcoSP/6Q9h4uDUVwJfnGB8D9mot9pr7WpO3hulvojfF7vt/98JnUe2qx\n4mUKMPKu/ewo0JwC9WDdd6RaCu/qEhfV4nrmWT87LBaHgM2c61rB3FOEj34qnElz\nOIYC50sxgZHtNmJmpQlD01OsJXLjniwlApaOc1/cmQKNNjneDYnVTDDy9gTpQBTa\nBdSzaN1wGqvqwWNsy/CLFNvT6mQq9rl9ZQpdYyO8FErlcqFG0DwQdn4pkJtuhq0m\nTZieTkeIt0a2PxwW7vvZ9cGY7eRUfeQgRJqjagqnvwKBgQD8bLrOmgQMTK+21xTp\nYYPb7yhSpQUZm3wbl07YxBGcX8ox0zHup5sCxAFEjw/+PFb3JlrusIajFkWN0wzZ\nTx2ohlh2EVuU/ORvg9Xqbst+6tAdA+mKphOEcN0GeX5W32txLEqNlMov8ZxwHxEZ\n21tNkpNmxKaKqau56wRfY2rJTwKBgQDHQzcWvNAemFmgRrehe8dLJIskqm6/mmGn\nbtaXsP/LFcHHg+qhSNmz6lGwauK90c/M7kKVOLy2vrYF/MXxNdQJZeK4IUST78Fl\njZmWpRZjU5MVqe/w/L5Aq/UYsCkEVaFbOm/ygSNPwgH4vh3oU/bubmb6n66LlbA0\nLni8TPjCYwKBgQCnMhm2GPvPbcgBcosuXmHpfoqV2yn6oSteVyVpnM0RZ71UrU/o\nhOm+tjckwyHTwwHTaHtYmGJFic3+N6nOEoJRitLzOWIQ2EUyu/8n7cUqRrwcS+gX\n5xMMaXls/XI6dngDGVQ0XTZi9UUqWtmH5+ydABZUPrMVK3dMiSd3SzGDLwKBgHM1\nhbB70skdxRRKTvnrGztzEZBNimL12+h2yVRDXmIJXlUBDLPb7yN7I2ghJKAjo0YV\nrCGjAFmYwp2LnNbuDH6yjfdwJLp0MRmKWXckVGFxfOVVsAlh2I6D3d48XDrJV9Xr\nX7aSu9vtjD5Jjfk6MteAtcHKeZzzG0HQbLZSurGJAoGBAJQQ4UUy915JubbjXtRv\nCTKdudbiBkGHp+hSdcJwYQjO6hmf0qvZt4wkPpMq7gmcO62dWhfA8scTjqH+tyiu\noec616EsoupBV17EJBEKIC5LlOyTwZMnCSpssHBg2rbABcNqaqK5nqQEMWOOB7P7\nZHV8w3OhFIxfQLRrX598Ozat\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-account@safewell-442418.iam.gserviceaccount.com",
+  "client_id": "103150572308043412990",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-account%40safewell-442418.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

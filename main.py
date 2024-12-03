@@ -13,13 +13,11 @@ from google.oauth2 import service_account
 GOOGLE_DRIVE_SCOPE = ['https://www.googleapis.com/auth/drive']
 
 # Zoho CRM credentials from environment variables
-ZOHO_REFRESH_TOKEN = os.environ.get('ZOHO_REFRESH_TOKEN')
-ZOHO_CLIENT_ID = os.environ.get('ZOHO_CLIENT_ID')
-ZOHO_CLIENT_SECRET = os.environ.get('ZOHO_CLIENT_SECRET')
-ZOHO_TOKEN_URL = 'https://accounts.zoho.com/oauth/v2/token'
+ZOHO_REFRESH_TOKEN = "1000.0c28c5dcc37b8a49d800b5a7ca37fcd6.6702d560fccfba716546ba4527a1bae4"
+ZOHO_CLIENT_ID = "1000.752PQ5GZY3S2SKSKF60CE6LWY0DHTK"
+ZOHO_CLIENT_SECRET = "89fb8bce9fe707b3eb40b325d392667e05edf4b6c7"
+ZOHO_TOKEN_URL = "https://accounts.zoho.com/oauth/v2/token"
 
-
-# Zoho CRM domain
 ZOHO_CRM_DOMAIN = 'https://www.zohoapis.com'
 
 # Batch processing constants
@@ -32,7 +30,7 @@ access_token = None
 
 def authenticate_google_drive():
     # Read the service account JSON file from an environment variable
-    service_account_file = 'safewell-442418-76659bb8e6bf.json'
+    service_account_file = 'safewell-442418-81f1d6c69af0.json'
     if not service_account_file or not os.path.exists(service_account_file):
         print("Error: Service account file path not set or file does not exist.")
         exit(1)
@@ -146,7 +144,7 @@ def token_refresher():
 
 def main():
     csv_file_path = 'updated_file2.csv'
-    parent_folder_id = os.environ.get('GOOGLE_DRIVE_PARENT_FOLDER_ID')  # Replace with your parent folder ID or set as an environment variable
+    parent_folder_id = '1VeR-E_NVIGFvYi68U_0kOKkShTVzQUUr'# Replace with your parent folder ID or set as an environment variable
     
     # Authenticate Google Drive API
     drive_service = authenticate_google_drive()
@@ -178,6 +176,7 @@ def main():
         full_name = row.get('Full_Name', '')
         mailing_street = row.get('Mailing_Street', '')
         well_id = row.get('Well_Id', '')
+        location = row.get('Image Field','')
 
         # Include all components as they are, including whitespace and special characters
         folder_name = f"{full_name}_{mailing_street}_{well_id}"
@@ -200,7 +199,7 @@ def main():
             continue  # Skip to the next row
 
         # Construct file name
-        file_name = f"{full_name}_{file_id_s_extracted}.jpg"
+        file_name = f"{location}_{file_id_s_extracted}.jpg"
 
         # Upload file to Google Drive
         try:
