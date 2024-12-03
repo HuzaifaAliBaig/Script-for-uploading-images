@@ -18,6 +18,7 @@ ZOHO_CLIENT_ID = os.environ.get('ZOHO_CLIENT_ID')
 ZOHO_CLIENT_SECRET = os.environ.get('ZOHO_CLIENT_SECRET')
 ZOHO_TOKEN_URL = 'https://accounts.zoho.com/oauth/v2/token'
 
+
 # Zoho CRM domain
 ZOHO_CRM_DOMAIN = 'https://www.zohoapis.com'
 
@@ -31,7 +32,7 @@ access_token = None
 
 def authenticate_google_drive():
     # Read the service account JSON file from an environment variable
-    service_account_file = os.environ.get('GOOGLE_SERVICE_ACCOUNT_FILE')
+    service_account_file = 'safewell-442418-76659bb8e6bf.json'
     if not service_account_file or not os.path.exists(service_account_file):
         print("Error: Service account file path not set or file does not exist.")
         exit(1)
