@@ -30,7 +30,7 @@ access_token = None
 
 def authenticate_google_drive():
     # Read the service account JSON file from an environment variable
-    service_account_file = 'safewell-442418-81f1d6c69af0.json'
+    service_account_file = '/etc/secrets/Google_Key.json'
     if not service_account_file or not os.path.exists(service_account_file):
         print("Error: Service account file path not set or file does not exist.")
         exit(1)
