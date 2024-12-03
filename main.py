@@ -23,9 +23,9 @@ logging.basicConfig(
 GOOGLE_DRIVE_SCOPE = ['https://www.googleapis.com/auth/drive']
 
 # Zoho CRM credentials from environment variables
-ZOHO_REFRESH_TOKEN = os.getenv("ZOHO_REFRESH_TOKEN", "your_refresh_token")
-ZOHO_CLIENT_ID = os.getenv("ZOHO_CLIENT_ID", "your_client_id")
-ZOHO_CLIENT_SECRET = os.getenv("ZOHO_CLIENT_SECRET", "your_client_secret")
+ZOHO_REFRESH_TOKEN = "1000.0c28c5dcc37b8a49d800b5a7ca37fcd6.6702d560fccfba716546ba4527a1bae4"
+ZOHO_CLIENT_ID = "1000.752PQ5GZY3S2SKSKF60CE6LWY0DHTK"
+ZOHO_CLIENT_SECRET = "89fb8bce9fe707b3eb40b325d392667e05edf4b6c7"
 ZOHO_TOKEN_URL = "https://accounts.zoho.com/oauth/v2/token"
 
 ZOHO_CRM_DOMAIN = 'https://www.zohoapis.com'
@@ -33,6 +33,7 @@ ZOHO_CRM_DOMAIN = 'https://www.zohoapis.com'
 # Batch processing constants
 BATCH_SIZE = 50  # Number of rows per batch
 PROGRESS_FILE = 'progress.txt'  # File to save progress
+UPLOADED_FILES_FILE = 'uploaded_files.json'  # File to save uploaded File IDs
 
 # Global variable to store the access token
 access_token = None
@@ -53,18 +54,12 @@ def authenticate_google_drive():
     return drive_service
 
 def read_csv_file(csv_file_path):
-    """Read CSV file, remove duplicate rows based on 'File_Id__s', and return list of unique rows."""
-    unique_rows = {}
+    """Read CSV file and return list of rows as dictionaries."""
     with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)  # Comma is the default delimiter
-        for row in reader:
-            file_id_s = row.get('File_Id__s', '').strip()
-            if file_id_s and file_id_s not in unique_rows:
-                unique_rows[file_id_s] = row
-            elif not file_id_s:
-                logging.warning("Encountered row with empty 'File_Id__s'. Skipping.")
-    logging.info(f"Read {len(unique_rows)} unique rows from CSV file.")
-    return list(unique_rows.values())
+        rows = [row for row in reader]
+    logging.info(f"Read {len(rows)} rows from CSV file.")
+    return rows
 
 def folder_exists(drive_service, folder_name, parent_folder_id=None):
     """
@@ -129,34 +124,6 @@ def create_folder(drive_service, folder_name, parent_folder_id=None):
         logging.error(f"Error creating folder '{folder_name}': {e}")
         return None
 
-def file_exists(drive_service, file_name, folder_id):
-    """
-    Check if a file exists in the specified Google Drive folder.
-    Returns True if exists, else False.
-    """
-    # Escape single quotes in file_name
-    file_name_escaped = file_name.replace("'", "\\'")
-    
-    query = f"name = '{file_name_escaped}' and trashed = false and '{folder_id}' in parents"
-    
-    logging.debug(f"Checking if file exists with query: {query}")
-    
-    try:
-        response = drive_service.files().list(
-            q=query,
-            spaces='drive',
-            fields='files(id, name)',
-            pageSize=1000
-        ).execute()
-        
-        files = response.get('files', [])
-        logging.info(f"Found {len(files)} files matching '{file_name}' in folder ID: {folder_id}.")
-        
-        return len(files) > 0
-    except Exception as e:
-        logging.error(f"Error checking file existence: {e}")
-        return False
-
 def fetch_file_from_zoho(file_id):
     """Fetch file data from Zoho CRM."""
     global access_token
@@ -166,36 +133,23 @@ def fetch_file_from_zoho(file_id):
     }
     url = f'{ZOHO_CRM_DOMAIN}/crm/v3/files'
     params = {'id': file_id}
-    try:
-        response = requests.get(url, headers=headers, params=params)
-        
-        if response.status_code == 401:
-            logging.warning("Access token expired. Refreshing token...")
-            access_token = refresh_access_token()
-            if access_token:
-                headers['Authorization'] = f'Zoho-oauthtoken {access_token}'
-                response = requests.get(url, headers=headers, params=params)
-            else:
-                logging.error("Failed to refresh access token.")
-                raise Exception("Access token expired and could not be refreshed.")
-        
-        response.raise_for_status()
-        logging.debug(f"Fetched file from Zoho CRM with ID: {file_id}")
-        return response.content
-    except requests.HTTPError as e:
-        logging.error(f"HTTP error while fetching file ID {file_id}: {e}")
-        raise
-    except Exception as e:
-        logging.error(f"Unexpected error while fetching file ID {file_id}: {e}")
-        raise
+    response = requests.get(url, headers=headers, params=params)
+    
+    if response.status_code == 401:
+        logging.warning("Access token expired. Refreshing token...")
+        access_token = refresh_access_token()
+        if access_token:
+            headers['Authorization'] = f'Zoho-oauthtoken {access_token}'
+            response = requests.get(url, headers=headers, params=params)
+        else:
+            raise Exception("Failed to refresh access token.")
+    
+    response.raise_for_status()
+    logging.debug(f"Fetched file from Zoho CRM with ID: {file_id}")
+    return response.content
 
 def upload_file_to_drive(drive_service, folder_id, file_name, file_data):
     """Upload a file to Google Drive under the specified folder."""
-    # Check if the file already exists
-    if file_exists(drive_service, file_name, folder_id):
-        logging.info(f"File '{file_name}' already exists in folder ID: {folder_id}. Skipping upload.")
-        return None  # Or return the existing file ID if needed
-    
     file_metadata = {
         'name': file_name,
         'parents': [folder_id],
@@ -257,6 +211,30 @@ def refresh_access_token():
         logging.error(f"Exception during token refresh: {e}")
         return None
 
+def load_uploaded_file_ids():
+    """Load the set of uploaded File IDs from the JSON file."""
+    if os.path.exists(UPLOADED_FILES_FILE):
+        try:
+            with open(UPLOADED_FILES_FILE, 'r') as f:
+                uploaded_ids = set(json.load(f))
+            logging.info(f"Loaded {len(uploaded_ids)} uploaded File IDs from '{UPLOADED_FILES_FILE}'.")
+            return uploaded_ids
+        except Exception as e:
+            logging.error(f"Error loading uploaded File IDs: {e}")
+            return set()
+    else:
+        logging.info(f"No '{UPLOADED_FILES_FILE}' found. Starting with an empty set.")
+        return set()
+
+def save_uploaded_file_ids(uploaded_ids):
+    """Save the set of uploaded File IDs to the JSON file."""
+    try:
+        with open(UPLOADED_FILES_FILE, 'w') as f:
+            json.dump(list(uploaded_ids), f, indent=4)
+        logging.info(f"Saved {len(uploaded_ids)} uploaded File IDs to '{UPLOADED_FILES_FILE}'.")
+    except Exception as e:
+        logging.error(f"Error saving uploaded File IDs: {e}")
+
 def main():
     global access_token
     csv_file_path = 'updated.csv'
@@ -289,6 +267,9 @@ def main():
     except Exception as e:
         logging.error(f"Error caching existing folders: {e}")
 
+    # Load uploaded File IDs
+    uploaded_file_ids = load_uploaded_file_ids()
+
     # Refresh access token before starting
     access_token = refresh_access_token()
     if not access_token:
@@ -303,6 +284,11 @@ def main():
         if not file_id_s:
             logging.warning(f"Row {i}: 'File_Id__s' is empty. Skipping.")
             continue  # Skip rows where 'File_Id__s' is empty
+
+        # **Check if File ID has already been uploaded**
+        if file_id_s in uploaded_file_ids:
+            logging.info(f"Row {i}: File ID '{file_id_s}' has already been uploaded. Skipping.")
+            continue  # Skip already uploaded files
 
         # Construct folder name using Full_Name, Mailing_Street, and Well_Id without stripping
         full_name = row.get('Full_Name', '').strip()
@@ -341,10 +327,18 @@ def main():
         try:
             uploaded_file_id = upload_file_to_drive(drive_service, folder_id, file_name, file_data)
             if not uploaded_file_id:
-                logging.info(f"File '{file_name}' already exists. Skipping upload.")
+                logging.error(f"Failed to upload file '{file_name}' to Google Drive.")
+                continue  # Skip to the next row
         except Exception as e:
             logging.error(f"Failed to upload file '{file_name}' to Google Drive. Error: {e}")
             continue  # Optionally continue to next row
+
+        # **Add the File ID to the uploaded list and save**
+        uploaded_file_ids.add(file_id_s)
+        save_uploaded_file_ids(uploaded_file_ids)
+
+        # **Add a 1-Second Delay After Each Upload**
+        time.sleep(1)
 
         rows_processed += 1
         current_index = i + 1  # Next index to process
@@ -359,7 +353,7 @@ def main():
                 logging.error("Failed to refresh access token. Exiting...")
                 break  # Exit the loop if token refresh fails
 
-            # Save progress after each batch
+            # Optional: Save progress after each batch
             save_progress(current_index)
 
     # Save progress after processing all rows
@@ -375,3 +369,6 @@ def main():
             logging.info("Processing complete.")
     else:
         logging.info(f"Processing stopped at index {start_index + rows_processed}.")
+
+if __name__ == '__main__':
+    main()
