@@ -51,11 +51,15 @@ def folder_exists(drive_service, folder_name, parent_folder_id=None):
         query = f"name = '{folder_name}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false and '{parent_folder_id}' in parents"
     else:
         query = f"name = '{folder_name}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
-    response = drive_service.files().list(q=query, spaces='drive', fields='files(id, name)').execute()
-    files = response.get('files', [])
-    if files:
-        return files[0]['id']  # Return the first matching folder ID
-    else:
+    try:
+        response = drive_service.files().list(q=query, spaces='drive', fields='files(id, name)').execute()
+        files = response.get('files', [])
+        if files:
+            return files[0]['id']  # Return the first matching folder ID
+        else:
+            return None
+    except Exception as e:
+        print(f"Error checking if folder '{folder_name}' exists: {e}")
         return None
 
 def create_folder(drive_service, folder_name, parent_folder_id=None):
@@ -141,6 +145,8 @@ def token_refresher():
         else:
             print("Failed to obtain access token. Retrying in 1 minute...")
             time.sleep(60)
+def escape_quotes(s):
+    return s.replace("'", "\\'")
 
 def main():
     csv_file_path = 'updated_file2.csv'
@@ -176,10 +182,15 @@ def main():
         full_name = row.get('Full_Name', '')
         mailing_street = row.get('Mailing_Street', '')
         well_id = row.get('Well_Id', '')
-        location = row.get('Image Field','')
+        location = row.get('Image Field', '')
+
+        # Escape single quotes in each component
+        full_name_escaped = escape_quotes(full_name)
+        mailing_street_escaped = escape_quotes(mailing_street)
+        well_id_escaped = escape_quotes(well_id)
 
         # Include all components as they are, including whitespace and special characters
-        folder_name = f"{full_name}_{mailing_street}_{well_id}"
+        folder_name = f"{full_name_escaped}_{mailing_street_escaped}_{well_id_escaped}"
 
         # Check if folder exists
         folder_id = folder_exists(drive_service, folder_name, parent_folder_id)
