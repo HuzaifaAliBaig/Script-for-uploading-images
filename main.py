@@ -146,8 +146,8 @@ def token_refresher():
             print("Failed to obtain access token. Retrying in 1 minute...")
             time.sleep(60)
 def escape_quotes(s):
-    return s.replace("'", "\\'")
-
+    return s.replace("'", "\'")
+print('script\'s')
 def main():
     csv_file_path = 'updated_file2.csv'
     parent_folder_id = '1VeR-E_NVIGFvYi68U_0kOKkShTVzQUUr'# Replace with your parent folder ID or set as an environment variable
